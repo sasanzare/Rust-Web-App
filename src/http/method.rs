@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
-pub  enum Method {
+#[derive(Debug)]
+pub enum Method {
     GET,
     POST,
     DELETE,

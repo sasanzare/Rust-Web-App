@@ -1,12 +1,13 @@
 use super::method::{Method, MethodError};
-use std::str::Utf8Error;
+use super::QueryString;
 use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{Debug,Formatter,Display, Result as FmtResult};
 use std::str;
-use super::QueryString;
+use std::str::Utf8Error;
 
 
+#[derive(Debug)]
 pub struct Request<'buf> {
     path: &'buf str,
     query_string: Option<QueryString<'buf>>,
@@ -41,7 +42,6 @@ impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
             query_string,
             method,
         })
-        // unimplemented!()
     }
 }
 
