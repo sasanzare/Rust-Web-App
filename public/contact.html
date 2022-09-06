@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link href="./css/style.css" rel="stylesheet">
+  <title> sasan zare</title>
+</head>
+
+<body>
+    <div class="wrap">
+      <header class="header">
+  <div class="header__section header__section--media">
+      <a class="logo" href="./index.html">
+      <img width="100" height="100" src="./img/saza.jpg" alt="saza">
+      </a>
+  </div>
+
+  <div class="header__section header__section--menu">
+      <a class="logo" href="./index.html">
+          <span class="logo__text">
+              sasan zare
+          </span>
+      </a>
+
+      <nav class="menu">
+          <a class="menu__item " href="./work.html">
+              Work
+          </a>
+          <a class="menu__item "
+              href="./projects.html">
+              Projects
+          </a>
+          <a class="menu__item "
+              href="./articles.html">
+              Articles
+          </a>
+          <a class="menu__item "
+              href="./contact.html">
+              Contact
+          </a>
+      </nav>
+  </div>
+</header>
+
+
+
+    <section class="page">
+        <div class="wysiwyg">
+            <h1>
+                Contact Me
+            </h1>
+
+            <p class="txt-large">If you’d like to chat about a project or just have question, please fill in the form
+                below. I aim to get back within 2 days.</p>
+        </div>
+
+        <div class="mt-large">
+
+            <form id="contact-form" class="form" method="post"
+                data-recaptcha-form="contact">
+                <div class="form__row">
+                    <div class="form__field">
+                        <label for="name" class="form__label">
+                            Name <span class="form__required">*</span>
+                        </label>
+                        <input id="name" name="name" type="text" required>
+                    </div>
+
+                    <div class="form__field">
+                        <label for="email" class="form__label">
+                            Email <span class="form__required">*</span>
+                        </label>
+                        <input id="email" name="email" type="email" required>
+                    </div>
+                </div>
+
+                <div class="form__row">
+                    <div class="form__field">
+                        <label for="subject" class="form__label">
+                            Subject <span class="form__required">*</span>
+                        </label>
+                        <input id="subject" name="subject" type="text" required>
+                    </div>
+                </div>
+
+                <div class="form__row">
+                    <div class="form__field">
+                        <label for="message" class="form__label">
+                            Message <span class="form__required">*</span>
+                        </label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form__row">
+                    <div class="form__field">
+                        <div class="hidden">
+                            <input name="subject_2" type="text">
+                        </div>
+
+                        <button class="btn">
+                            Send Message
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+        <footer class="footer">
+    <div class="footer__inner">
+        <p class="footer__text">
+            &copy; 2022 sasan zare.
+        </p>
+        <p class="footer__text">
+            Built with <a class="highlight-saza" href="https://sasanzare.ir/" target="_blank">sasan zare</a>.
+        </p>
+    </div>
+</footer>
+    </div>
+    </body>
+
+</html>
