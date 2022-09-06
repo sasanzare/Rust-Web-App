@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link href="./css/style.css" rel="stylesheet">
+  <title> sasan zare</title>
+</head>
+
+<body>
+    <div class="wrap">
+      <header class="header">
+  <div class="header__section header__section--media">
+      <a class="logo" href="./index.html">
+      <img width="100" height="100" src="./img/saza.jpg" alt="saza">
+      </a>
+  </div>
+
+  <div class="header__section header__section--menu">
+      <a class="logo" href="./index.html">
+          <span class="logo__text">
+              sasan zare
+          </span>
+      </a>
+
+      <nav class="menu">
+          <a class="menu__item " href="./work.html">
+              Work
+          </a>
+          <a class="menu__item "
+              href="./projects.html">
+              Projects
+          </a>
+          <a class="menu__item "
+              href="./articles.html">
+              Articles
+          </a>
+          <a class="menu__item "
+              href="./contact.html">
+              Contact
+          </a>
+      </nav>
+  </div>
+</header>
+
+            <section>
+        <div class="grid grid--tb2-12">
+            <div class="grid__column grid__column--4">
+                <div class="mb-tiny">
+    <p class="subheading">
+        Search
+    </p>
+</div>
+
+<div class="mb-medium">
+    <form class="search-form" action="https://sebkay.com/articles">
+        <input class="search-form__field" type="text" name="s" placeholder="PHP, WordPress, Freelancing..."
+            enterkeyhint="search" value="">
+        <button class="search-form__action">
+            Search
+        </button>
+    </form>
+</div>
+
+                <div class="mb-tiny">
+        <p class="subheading">
+            Filter By
+        </p>
+    </div>
+
+    <ul class="link-list">
+                    <li class="link-list__item ">
+                <a class="tag" href="#"
+                    >
+                    Freelancing
+                </a>
+            </li>
+                    <li class="link-list__item ">
+                <a class="tag" href="#"
+                    >
+                    Copywriting
+                </a>
+            </li>
+                    <li class="link-list__item ">
+                <a class="tag" href="#"
+                    >
+                    Side Projects
+                </a>
+            </li>
+                    <li class="link-list__item ">
+                <a class="tag" href="#"
+                     style="border-color: #0073AA; color: #0073AA;" >
+                    WordPress
+                </a>
+            </li>
+                    <li class="link-list__item ">
+                <a class="tag" href="#"
+                    >
+                    Tips
+                </a>
+            </li>
+                    <li class="link-list__item ">
+                <a class="tag" href="#"
+                    >
+                    Advice
+                </a>
+            </li>
+                    <li class="link-list__item ">
+                <a class="tag" href="#"
+                    >
+                    Assorted
+                </a>
+            </li>
+                    <li class="link-list__item ">
+                <a class="tag" href="#"
+                     style="border-color: #F9322C; color: #F9322C;" >
+                    Laravel
+                </a>
+            </li>
+            </ul>
+            </div>
+
+            <div class="grid__column grid__column--8">
+                <div class="mb-large">
+                    <h1 class="mb-tiny">
+                        Multi-Image Uploader with Laravel, JavaScript &amp; Tailwind
+                    </h1>
+                    <p class="mb-medium txt-fade">
+                        <a class="tag" href="#"
+                             style="border-color: #F9322C; color: #F9322C;" >
+                            Laravel
+                        </a>
+                        <br>
+                        02 May 2022
+                        /
+                        7 minute read
+                    </p>
+                    <p class="txt-large">
+                        A step-by-step guide on creating a multi-image uploader using Laravel, JavaScript &amp; Tailwind.
+                    </p>
+
+                    <div class="wysiwyg mt-small">
+
+<p><img src="./img/multi-image-uploader-laravel-javascript-example_mtr0qr.gif" alt="" /></p>
+<p>Uploading images to the web is hard. Luckily for us, Laravel makes dealing with image upload really simple. That being said, it's a fair bit of effort creating the JavaScript to handle the UI, so that's what we'll be focusing on today.</p>
+<p>I recently had to build a multi-image uploader for a WordPress site. I set everything up in a very &quot;Laravel-like&quot; way so I had some familiarity when dealing with the <code>$_POST</code> and <code>$_FILES</code> request arrays (I ended up building my own custom <code>Request</code> class!).</p>
+<p>The work on that WordPress site is what inspired this post. If you'd like to know more about how I make my WordPress sites more Laravel-like, <a href="https://twitter.com/sebkaydesign">give me a shout</a>.</p>
+<hr />
+<h2>1. Create A Route For Handling Uploads</h2>
+<p>To create a new route for handling our image uploads, open your <code>routes/web.php</code> file. If you're doing this in a fresh Laravel app you'll see only one route, the home route.</p>
+<p>Create a new <code>post</code> route that goes to <code>/gallery-upload</code>:</p>
+<pre><code class="language-php">use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+Route::post('gallery-upload', function (Request $request) {
+    //
+});
+</code></pre>
+<p>First we'll need to add some validation to our route to make sure we only accept a single image:</p>
+<pre><code class="language-php">use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+Route::post('gallery-upload', function (Request $request) {
+    $validated = $request-&gt;validate([
+        'image' =&gt; [
+            'required',
+            'image',
+            'mimes:jpg,jpeg,png,gif',
+            'max:2048',
+        ],
+    ]);
+});
+</code></pre>
+<p>If the image upload fails, or someone tries to upload an image type we don't accept, Laravel will return a a 422 error. We'll handle this error later on with Axios.</p>
+<p>Now we need to actually store the image. Thankfully, Laravel makes it super simple with the <code>Illuminate\Support\Facades\Storage</code> facade.</p>
+<pre><code class="language-php">use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+
+Route::post('gallery-upload', function (Request $request) {
+    $validated = $request-&gt;validate([
+        'image' =&gt; [
+            'required',
+            'image',
+            'mimes:jpg,jpeg,png,gif',
+            'max:2048',
+        ],
+    ]);
+
+    Storage::disk('public')-&gt;put('/uploads', $validated['image']);
+});
+</code></pre>
+<p>This will save the image in the <code>storage/app/public/uploads</code> directory.</p>
+<p>If you need a more dedicated storage solution, it's worth looking at something like an S3 compatible filesystem. Laravel <a href="https://laravel.com/docs/9.x/filesystem#amazon-s3-compatible-filesystems">has support</a> for that.</p>
+<hr />
+<h2>2. Create the Form HTML</h2>
+<p>I won't bore you by going in-depth on all the Tailwind classes used for the page and form layout. It's actually just a slightly tweaked version of <a href="https://tailwindui.com/components/application-ui/forms/form-layouts">an example</a> from the Tailwind UI site.</p>
+<p>Here's the exact HTML markup with Tailwind CSS classes if you'd like it:</p>
+<pre><code class="language-html">&lt;div class=&quot;relative flex items-top justify-center min-h-screen sm:items-center p-10 sm:pt-0&quot;&gt;
+    &lt;div class=&quot;md:grid md:grid-cols-3 md:gap-6 max-w-7xl&quot;&gt;
+        &lt;div class=&quot;md:col-span-1&quot;&gt;
+            &lt;div class=&quot;px-4 sm:px-0&quot;&gt;
+                &lt;h2 class=&quot;text-2xl font-medium leading-6 text-gray-900&quot;&gt;Multi-Image Uploader&lt;/h2&gt;
+                &lt;p class=&quot;mt-5 text-lg text-gray-600&quot;&gt;Select some images and watch them upload with Axios.&lt;/p&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;mt-5 md:mt-0 md:col-span-2&quot;&gt;
+            &lt;form action=&quot;#&quot; method=&quot;POST&quot;&gt;
+                &lt;div class=&quot;shadow sm:rounded-md sm:overflow-hidden&quot;&gt;
+                    &lt;div class=&quot;px-4 py-5 bg-white space-y-6 sm:p-6&quot;&gt;
+                        &lt;label for=&quot;file-upload&quot;
+                            class=&quot;block text-lg font-medium text-gray-700&quot;&gt;Images&lt;/label&gt;
+                        &lt;div class=&quot;mt-3&quot;&gt;
+                            &lt;input id=&quot;gallery-uploader&quot;
+                                class=&quot;border-solid border-2 border-gray-300 rounded-md p-1.5&quot;
+                                name=&quot;gallery&quot; type=&quot;file&quot; accept=&quot;image/png,image/gif,image/jpeg&quot;
+                                multiple&gt;
+                        &lt;/div&gt;
+
+                        &lt;div class=&quot;upload-previews&quot;&gt;&lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/form&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+<hr />
+<h2>3. Install Axios via Yarn</h2>
+<p>Now let's install Axios. You can do so via <a href="https://yarnpkg.com/">Yarn</a> or <a href="https://www.npmjs.com/">NPM</a>.</p>
+<p>I'm a big fan of Yarn. I find it easier to use and a fair bit quicker than NPM when it comes to installing and updating packages.</p>
+<pre><code class="language-bash"># Install via Yarn
+yarn add axios
+
+# Install via NPM
+npm install axios
+</code></pre>
+<hr />
+<h2>4. Add SVGs to JavaScript</h2>
+<p>In your JavaScript file (in Laravel the default is <code>resources/js/app.js</code>) we're going to add some SVG code to use in our image preview template in the next step.</p>
+<pre><code class="language-javascript">const svgs = {
+    inProgress: `
+        &lt;svg class=&quot;animate-spin h-5 w-6&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; fill=&quot;none&quot; viewBox=&quot;0 0 24 24&quot;&gt;
+            &lt;circle class=&quot;opacity-25&quot; cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;10&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;4&quot;&gt;&lt;/circle&gt;
+            &lt;path fill=&quot;currentColor&quot; d=&quot;M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z&quot;&gt;&lt;/path&gt;
+        &lt;/svg&gt;`,
+    done: `
+        &lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; class=&quot;h-6 w-6&quot; fill=&quot;none&quot; viewBox=&quot;0 0 24 24&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot;&gt;
+            &lt;path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; d=&quot;M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z&quot; /&gt;
+        &lt;/svg&gt;`,
+    error: `
+        &lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; class=&quot;h-6 w-6&quot; fill=&quot;none&quot; viewBox=&quot;0 0 24 24&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot;&gt;
+            &lt;path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; d=&quot;M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z&quot; /&gt;
+        &lt;/svg&gt;`,
+};
+</code></pre>
+<p>These icons are from the <a href="https://heroicons.com/">Heroicons</a> set.</p>
+<hr />
+<h2>5. Create JavaScript Template Literals</h2>
+<p>We're going to need some JavaScript HTML templates to display our image previews, both before and after they're uploaded.</p>
+<p>In JavaScript, you can use template literals to add HTML markup. This gives you both the ability to format it properly with line-breaks but also, and arguably more importantly, it gives you the ability to use variables inside a string, like so:</p>
+<pre><code class="language-javascript">let text = &quot;an embedded variable&quot;
+let htmlMarkup = `Some markup with ${text}.`;
+
+// Output: Some markup with an embedded variable
+</code></pre>
+<p>Here's the template for the image preview (with a couple of possible states):</p>
+<pre><code class="language-javascript">/**
+ * @param {HTMLInputElement} file
+ * @param {String} image
+ * @param {Number} index
+ * @param {String} status
+ *
+ * @returns {String}
+ */
+function filePreviewTemplate(file, image, index, status = 'inProgress') {
+    let icon = svgs[status] ?? '';
+    let cssClasses = '';
+
+    if (status === 'error') {
+        cssClasses = 'text-red-500';
+    } else if (status === 'done') {
+        cssClasses = 'text-green-500';
+    }
+
+    return `
+        &lt;div class=&quot;mt-1 ${cssClasses}&quot; data-upload-preview=&quot;${index}&quot;&gt;
+            &lt;div class=&quot;mb-2.5 flex items-center&quot;&gt;
+                &lt;div class=&quot;mr-2.5 shrink-0&quot;&gt;
+                    &lt;span data-upload-preview-icon=&quot;${index}&quot;&gt;
+                        ${icon}
+                    &lt;/span&gt;
+                &lt;/div&gt;
+
+                &lt;img class=&quot;mr-2.5 shrink-0 w-14 h-14&quot; src=&quot;${image}&quot; alt=&quot;&quot;&gt;
+
+                &lt;div class=&quot;flex items-center w-full&quot;&gt;
+                    &lt;p class=&quot;text-base&quot;&gt;
+                        ${file.name}
+                    &lt;/p&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    `;
+}
+</code></pre>
+<p>You'll see we pass some parameters to the function:</p>
+<ul>
+<li>
+<code>file</code> - A HTML input element</li>
+<li>
+<code>image</code> - A single image object. We'll get this from the file input later.</li>
+<li>
+<code>index</code> - The index of the file in the files array.</li>
+<li>
+<code>status</code> - Defaultd to <code>inProgress</code>, but can also be <code>error</code> or <code>done</code>.</li>
+</ul>
+<hr />
+<h2>6. Append Image Previews to Page</h2>
+<p>We're going to create an <code>uploadImages</code> function which will do the bulk of the work.</p>
+<p>It's going to accept a single parameter which is the array of file objects from the input.</p>
+<pre><code class="language-javascript">/**
+ * @param {File[]} files
+ */
+function uploadImages(files) {
+    if (!files.length) {
+        return;
+    }
+
+    for (let i = 0; i &lt; files.length; i++) {
+        let file = files[i];
+
+        let previewsElement = document.querySelector('.upload-previews');
+        let image = URL.createObjectURL(file);
+
+        previewsElement.innerHTML += filePreviewTemplate(file, image, i, 'inProgress');
+    }
+}
+</code></pre>
+<p>The above code loops through each file, then appends it the <code>innerHTML</code> property of the <code>.upload-previews</code> element we have set up to display them inside of.</p>
+<p>You'll see the div in the form template from step 2, <code>&lt;div class=&quot;upload-previews&quot;&gt;&lt;/div&gt;</code>.</p>
+<p>Our template function is then getting some arguments passed, the ones we discussed in the last step, and returning the corresponding HTML.</p>
+<hr />
+<h2>7. Upload Images via Axios</h2>
+<p>It's all well and good showing the previews on the page, but what's the point if they don't actually upload anywhere?</p>
+<p>Let's add a small snippet of Axios code to the end of each foreach iteration to handle the uploading of images:</p>
+<pre><code class="language-javascript">/**
+ * @param {File[]} files
+ */
+function uploadImages(files) {
+    if (!files.length) {
+        return;
+    }
+
+    for (let i = 0; i &lt; files.length; i++) {
+        let file = files[i];
+
+        let previewsElement = document.querySelector('.upload-previews');
+        let image = URL.createObjectURL(file);
+
+        previewsElement.innerHTML += filePreviewTemplate(file, image, i, 'inProgress');
+
+        let formData = new FormData();
+        formData.append('image', file);
+
+        axios.post('/gallery-upload', formData)
+            .then(response =&gt; {
+                previewsElement.querySelector(`[data-upload-preview=&quot;${i}&quot;]`).innerHTML = filePreviewTemplate(file, image, i, 'done');
+            })
+            .catch(error =&gt; {
+                previewsElement.querySelector(`[data-upload-preview=&quot;${i}&quot;]`).innerHTML = filePreviewTemplate(file, image, i, 'error');
+            });
+    }
+}
+</code></pre>
+<ul>
+<li>Create a <code>FormData()</code> object and append the image file to it.</li>
+<li>Make a post request to <code>/gallery-upload</code> with the <code>formData</code> variable.</li>
+<li>Use <code>.then()</code> to change the state of the image preview to <code>done</code> on success.</li>
+<li>Use <code>.catch()</code> to change the state of the image preview to <code>error</code> on failure.</li>
+</ul>
+<p>Because Axios uses JavaScript Promises to handle the request, all the images will upload asynchronously which means they won't block the <code>for</code> loop from continuing to the next image while the current one is uploading.</p>
+<hr />
+<h2>8. Watch For Input Changes</h2>
+<p>Let's set up a function to watch for changes to the files input. Every time it changes, we'll upload whatever images were selected.</p>
+<pre><code class="language-javascript">function ajaxGalleryUploader() {
+    let input = document.querySelector('#gallery-uploader');
+
+    if (!input) {
+        return;
+    }
+
+    input.addEventListener('change', () =&gt; {
+        uploadImages(input.files);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', ajaxGalleryUploader);
+</code></pre>
+<p>In the above snippet we do a few things:</p>
+<ul>
+<li>Find the input we'll be getting our images from.</li>
+<li>Check if it exists. If not then we exit early.</li>
+<li>Add an event listener for when the input changes and call our <code>uploadImages</code> function.</li>
+</ul>
+<hr />
+<h2>Conclusion</h2>
+<p>There you have it. A quick and simple multi-image uploader using Laravel, JavaScript and Tailwind.</p>
+<p>As you can see from the above, the process of uploading images is actually very simple when using Laravel. The hardest part is writing the JavaScript to manage the previews and Ajax requests.</p>
+<p>Laravel really shines in situations like this because you can so easily validate the incoming image, as well as store the image with a just a few lines of code.</p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+<div class="footer__inner">
+    <p class="footer__text">
+        &copy; 2022 sasan zare.
+    </p>
+    <p class="footer__text">
+        Built with <a class="highlight-saza" href="https://sasanzare.ir/" target="_blank">sasan zare</a>.
+    </p>
+</div>
+</footer>
+</div>
+    </body>
+
+</html>
