@@ -33,13 +33,17 @@ impl Handler for WebsiteHandler {
        match request.method(){
         Method::GET => match request.path() {
             "/" => Response::new(StatusCode::Ok,  self.read_file("index.html")),
-            "/about" => Response::new(StatusCode::Ok, self.read_file("about.html")),
+            "/work" => Response::new(StatusCode::Ok, self.read_file("work.html")),
+            "/projects" => Response::new(StatusCode::Ok, self.read_file("projects.html")),
+            "/contact" => Response::new(StatusCode::Ok, self.read_file("contact.html")),
+            "/articles" => Response::new(StatusCode::Ok, self.read_file("articles.html")),
+            "/article" => Response::new(StatusCode::Ok, self.read_file("article.html")),
             path => match self.read_file(path){
                 Some(contents) => Response::new(StatusCode::Ok, Some(contents)),
-                None => Response::new(StatusCode::NotFound, None),
+                None => Response::new(StatusCode::NotFound, self.read_file("404.html")),
             },
         },
-        _ => Response::new(StatusCode::NotFound, None),
+        _ => Response::new(StatusCode::NotFound, self.read_file("404.html")),
        }
     }
 }
